@@ -1,6 +1,7 @@
 package edu.cit.tupas.controller;
 
 import edu.cit.tupas.entity.BookingEntity;
+import edu.cit.tupas.facade.BookingFacade;
 import edu.cit.tupas.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,56 +17,55 @@ import java.util.Map;
 public class BookingController {
     
      @Autowired
-    private BookingService bookingService;
+     private BookingFacade bookingFacade;
     
     @PostMapping
     public ResponseEntity<BookingEntity> createBooking(
             @RequestBody BookingEntity booking,
             @RequestParam Long userId) {
-        BookingEntity createdBooking = bookingService.createBooking(booking, userId);
-        return ResponseEntity.ok(createdBooking);
+BookingEntity createdBooking = bookingFacade.createBooking(booking, userId);        return ResponseEntity.ok(createdBooking);
     }
     
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingEntity>> getUserBookings(@PathVariable Long userId) {
-        List<BookingEntity> bookings = bookingService.getBookingsByUser(userId);
+        List<BookingEntity> bookings = bookingFacade.getUserBookings(userId);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/user/{userId}/upcoming")
     public ResponseEntity<List<BookingEntity>> getUserUpcomingBookings(@PathVariable Long userId) {
-        List<BookingEntity> bookings = bookingService.getUpcomingBookingsByUser(userId);
+        List<BookingEntity> bookings = bookingFacade.getUserUpcomingBookings(userId);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/user/{userId}/status/{status}")
     public ResponseEntity<List<BookingEntity>> getUserBookingsByStatus(@PathVariable Long userId, 
                                                                       @PathVariable String status) {
-        List<BookingEntity> bookings = bookingService.getBookingsByUserAndStatus(userId, status);
+        List<BookingEntity> bookings = bookingFacade.getBookingsByUserAndStatus(userId, status);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/custodian/{custodianId}")
     public ResponseEntity<List<BookingEntity>> getCustodianBookings(@PathVariable Long custodianId) {
-        List<BookingEntity> bookings = bookingService.getBookingsForCustodian(custodianId);
+        List<BookingEntity> bookings = bookingFacade.getBookingsForCustodian(custodianId);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/custodian/{custodianId}/pending")
     public ResponseEntity<List<BookingEntity>> getCustodianPendingBookings(@PathVariable Long custodianId) {
-        List<BookingEntity> bookings = bookingService.getPendingBookingsForCustodian(custodianId);
+        List<BookingEntity> bookings = bookingFacade.getPendingBookingsForCustodian(custodianId);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping
     public ResponseEntity<List<BookingEntity>> getAllBookings() {
-        List<BookingEntity> bookings = bookingService.getAllBookings();
+        List<BookingEntity> bookings = bookingFacade.getAllBookings();
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<BookingEntity> getBookingById(@PathVariable Long id) {
-        return bookingService.getBookingById(id)
+        return bookingFacade.getBookingById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
@@ -73,7 +73,7 @@ public class BookingController {
     @PutMapping("/{id}")
     public ResponseEntity<BookingEntity> updateBooking(@PathVariable Long id, 
                                                      @RequestBody BookingEntity bookingDetails) {
-        BookingEntity updatedBooking = bookingService.updateBooking(id, bookingDetails);
+        BookingEntity updatedBooking = bookingFacade.updateBooking(id, bookingDetails);
         return ResponseEntity.ok(updatedBooking);
     }
     
@@ -83,38 +83,38 @@ public class BookingController {
         String status = statusUpdate.get("status");
         String cancelledBy = statusUpdate.get("cancelledBy");
         
-        BookingEntity updatedBooking = bookingService.updateBookingStatus(id, status, cancelledBy);
+        BookingEntity updatedBooking = bookingFacade.updateBookingStatus(id, status, cancelledBy);
         return ResponseEntity.ok(updatedBooking);
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
+        bookingFacade.deleteBooking(id);
         return ResponseEntity.ok().build();
     }
     
     @GetMapping("/venue/{venueId}")
     public ResponseEntity<List<BookingEntity>> getBookingsByVenue(@PathVariable Long venueId) {
-        List<BookingEntity> bookings = bookingService.getBookingsByVenue(venueId);
+        List<BookingEntity> bookings = bookingFacade.getBookingsByVenue(venueId);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/date/{date}")
     public ResponseEntity<List<BookingEntity>> getBookingsByDate(@PathVariable java.util.Date date) {
-        List<BookingEntity> bookings = bookingService.getBookingsByDate(date);
+        List<BookingEntity> bookings = bookingFacade.getBookingsByDate(date);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/status/{status}")
     public ResponseEntity<List<BookingEntity>> getBookingsByStatus(@PathVariable String status) {
-        List<BookingEntity> bookings = bookingService.getBookingsByStatus(status);
+        List<BookingEntity> bookings = bookingFacade.getBookingsByStatus(status);
         return ResponseEntity.ok(bookings);
     }
     
     @GetMapping("/availability/{venueId}/{date}")
     public ResponseEntity<Boolean> checkVenueAvailability(@PathVariable Long venueId, 
                                                          @PathVariable java.util.Date date) {
-        boolean isAvailable = bookingService.isVenueAvailable(venueId, date);
+        boolean isAvailable = bookingFacade.isVenueAvailable(venueId, date);
         return ResponseEntity.ok(isAvailable);
     }
 
@@ -123,10 +123,10 @@ public class BookingController {
     @GetMapping("/status-summary")
     public ResponseEntity<Map<String, Long>> getBookingStatusSummary() {
         Map<String, Long> summary = new HashMap<>();
-        summary.put("pending",   bookingService.countByStatus("pending"));
-        summary.put("approved",  bookingService.countByStatus("approved"));
-        summary.put("rejected",  bookingService.countByStatus("rejected"));
-        summary.put("canceled",  bookingService.countByStatus("canceled"));
+        summary.put("pending",   bookingFacade.countByStatus("pending"));
+        summary.put("approved",  bookingFacade.countByStatus("approved"));
+        summary.put("rejected",  bookingFacade.countByStatus("rejected"));
+        summary.put("canceled",  bookingFacade.countByStatus("canceled"));
         return ResponseEntity.ok(summary);
     }
 

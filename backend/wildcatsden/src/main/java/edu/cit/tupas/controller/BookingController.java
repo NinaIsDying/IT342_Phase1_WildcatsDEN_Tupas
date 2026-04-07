@@ -2,7 +2,7 @@ package edu.cit.tupas.controller;
 
 import edu.cit.tupas.entity.BookingEntity;
 import edu.cit.tupas.facade.BookingFacade;
-import edu.cit.tupas.service.BookingService;
+import edu.cit.tupas.factory.BookingFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,9 +80,16 @@ BookingEntity createdBooking = bookingFacade.createBooking(booking, userId);    
     @PutMapping("/{id}/status")
     public ResponseEntity<BookingEntity> updateBookingStatus(@PathVariable Long id,
                                                            @RequestBody Map<String, String> statusUpdate) {
-        String status = statusUpdate.get("status");
+        String status = BookingFactory.normalizeStatus(statusUpdate.get("status"));
+        if (status == null) {
+            status = BookingFactory.normalizeStatus(statusUpdate.get("type"));
+        }
         String cancelledBy = statusUpdate.get("cancelledBy");
-        
+
+        if (status == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         BookingEntity updatedBooking = bookingFacade.updateBookingStatus(id, status, cancelledBy);
         return ResponseEntity.ok(updatedBooking);
     }

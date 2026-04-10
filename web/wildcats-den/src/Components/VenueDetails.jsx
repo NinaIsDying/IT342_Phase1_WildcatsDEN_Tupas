@@ -14,7 +14,6 @@ export default function VenueDetails({ onOpenLoginModal }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch venue data from API
   useEffect(() => {
     const fetchVenueData = async () => {
       try {
@@ -24,7 +23,7 @@ export default function VenueDetails({ onOpenLoginModal }) {
         if (response.ok) {
           const venueFromApi = await response.json();
           
-          console.log("API Response:", venueFromApi); // Debug log
+          console.log("API Response:", venueFromApi); 
           
           if (!venueFromApi || !venueFromApi.venueId) {
             throw new Error("Invalid venue data received from API");
@@ -35,15 +34,14 @@ export default function VenueDetails({ onOpenLoginModal }) {
             venueId: venueFromApi.venueId,
             venueName: venueFromApi.venueName || `Venue ${id}`,
             building: venueFromApi.venueLocation || "University Campus",
-            venueCapacity: venueFromApi.venueCapacity || 50, // Remove "persons" text
-            description: formatDescription(venueFromApi),
+            venueCapacity: venueFromApi.venueCapacity || 50, 
             amenities: formatAmenities(venueFromApi),
             images: formatGalleryImages(venueFromApi),
-            custodianId: venueFromApi.custodianId, // Add this
-            custodianName: venueFromApi.custodianName || "Campus Facilities" // Add this
+            custodianId: venueFromApi.custodianId, 
+            custodianName: venueFromApi.custodianName || "Campus Facilities" 
           };
           
-          console.log("Transformed data:", transformedData); // Debug log
+          console.log("Transformed data:", transformedData);
           
           setVenueData(transformedData);
           setError(null);
